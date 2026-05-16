@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Track Order — Bangali Sweets</title>
+  <meta name="description" content="Track your Bangali Sweets order in real-time."/>
+  <meta name="robots" content="noindex"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Manrope:wght@400;500;600;700;800&family=Hind:wght@400;500;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/site.css"/>
+  <style>
+    .tr-wrap { max-width: 880px; margin: 0 auto; padding: 32px 32px 80px; }
+    .tr-wrap h1 { font-family: var(--display); font-size: clamp(36px, 5vw, 56px); margin: 14px 0 24px; font-weight: 500; }
+
+    .lookup-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .lookup-card .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .order-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .order-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .order-head h2 { font-family: var(--display); font-size: 32px; margin: 0; }
+    .order-head .id { font-family: ui-monospace, monospace; font-size: 14px; color: var(--ink-3); margin-top: 2px; }
+    .order-head .total { font-family: var(--display); font-size: 28px; }
+
+    /* Tracker timeline */
+    .tracker {
+      padding: 14px 0;
+    }
+    .tr-step {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      position: relative;
+    }
+    .tr-step + .tr-step::before {
+      content: "";
+      position: absolute;
+      left: 17px; top: -8px; bottom: 56px;
+      border-left: 2px dashed var(--rule-strong);
+    }
+    .tr-step.done + .tr-step::before { border-left-style: solid; border-left-color: var(--ok); }
+    .tr-step .dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg-sub);
+      color: var(--ink-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      border: 2px solid var(--rule);
+      position: relative;
+      z-index: 1;
+    }
+    .tr-step.done .dot { background: var(--ok); color: #fff; border-color: var(--ok); }
+    .tr-step.curr .dot { background: var(--accent); color: #fff; border-color: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
+      50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+    }
+    .tr-step .body h3 { font-family: var(--display); font-size: 20px; margin: 0 0 2px; line-height: 1.1; }
+    .tr-step .body .when { font-size: 12px; color: var(--ink-3); margin-bottom: 6px; }
+    .tr-step .body p { font-size: 13px; color: var(--ink-2); margin: 0; line-height: 1.55; }
+    .tr-step.curr .body h3 { color: var(--accent); }
+    .tr-step:not(.done):not(.curr) .body { opacity: 0.6; }
+
+    /* Item list */
+    .items {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--rule);
+    }
+    .items h3 { font-family: var(--display); font-size: 20px; margin: 0 0 14px; }
+    .items .it {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule);
+      align-items: center;
+    }
+    .items .it:last-child { border-bottom: none; }
+    .items .it img { width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius); }
+    .items .it .n { font-weight: 600; font-size: 14px; }
+    .items .it .m { font-size: 12px; color: var(--ink-3); }
+    .items .it .p { font-weight: 600; }
+
+    /* Empty state */
+    .empty {
+      padding: 48px 32px;
+      text-align: center;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+    }
+    .empty .ic { font-size: 56px; margin-bottom: 16px; }
+
+    @media (max-width: 540px) {
+      .tr-wrap { padding: 16px 16px 64px; }
+      .lookup-card { padding: 22px; }
+      .lookup-card .field-row { grid-template-columns: 1fr; }
+      .order-card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main>
+    <div class="tr-wrap">
+      <nav class="crumb">
+        <a href="index.html">Home</a>
+        <span class="sep">›</span>
+        <span class="curr">Track Order</span>
+      </nav>
+      <h1 class="disp">Track your order</h1>
+
+      <div class="lookup-card">
+        <div style="font-weight: 600; margin-bottom: 14px;">Look up your order</div>
+        <div class="field-row">
+          <div>
+            <label class="label">Order ID</label>
+            <input class="input" id="lookup-id" placeholder="BS-2026-XXXXX"/>
+          </div>
+          <div>
+            <label class="label">Phone (last 4 digits)</label>
+            <input class="input" id="lookup-ph" placeholder="3210"/>
+          </div>
+        </div>
+        <button class="btn" onclick="lookup()">Track →</button>
+        <p style="font-size: 12px; color: var(--ink-3); margin: 14px 0 0;">
+          💡 Or sign in via <a href="account.html" style="color: var(--accent); display: inline; font-weight: 600;">My Account</a> to see all your orders.
+        </p>
+      </div>
+
+      <div id="content"></div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="assets/catalog.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    BB_APP.mount();
+
+    const params = new URLSearchParams(location.search);
+    const askId = params.get("id");
+
+    function lookup() {
+      const id = (document.getElementById("lookup-id").value || "").trim().toUpperCase();
+      if (!id) { BB_APP.toast("Enter an order ID"); return; }
+      renderOrder(id);
+    }
+    window.lookup = lookup;
+
+    function renderOrder(id) {
+      const orders = BB_APP.orders.read();
+      const order = orders.find(o => o.id === id);
+      const root = document.getElementById("content");
+
+      if (!order) {
+        root.innerHTML = `
+          <div class="empty">
+            <div class="ic">🔍</div>
+            <h2 class="h2 disp">Order not found</h2>
+            <p class="muted">Make sure your order ID looks like BS-2026-XXXXX. Place an order first or check <a href="account.html" style="color: var(--accent); display: inline">My Account</a>.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const date = new Date(order.placedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit" });
+      const eta = order.mode === "ship" ? "Tue, 19 May · by 7 PM"
+                : order.mode === "pickup" ? "Ready in 30 min"
+                : "Today · 6 PM";
+
+      // simulate current step based on time elapsed
+      const elapsedMin = (Date.now() - order.placedAt) / 60000;
+      const stepStates = [
+        { done: true,           label: "Order received",   t: date,                    msg: "We've received your order and payment." },
+        { done: elapsedMin > 2, label: "Packing now",      t: "~5 min ago",            msg: "Bhaiya Ram's team is plating your mithai in our Bhind kitchen." },
+        { done: elapsedMin > 8, label: "Quality check & seal", t: elapsedMin > 8 ? "~3 min ago" : "—", msg: "Final taste check, vacuum seal, and thermal liner for safe travel." },
+        { done: elapsedMin > 15, label: order.mode === "pickup" ? "Ready for pickup" : "Out for delivery", t: elapsedMin > 15 ? "Just now" : "—", msg: order.mode === "pickup" ? "Pickup from our Pustak Bazar outlet, Bhind." : "Our rider has your order. WhatsApp updates will follow." },
+        { done: false,          label: "Delivered",         t: `ETA · ${eta}`,         msg: "Enjoy! Tag us @bangalisweets.bhind for a chance at free mithai." },
+      ];
+      // mark the current step (first non-done) as curr
+      let currMarked = false;
+      stepStates.forEach(s => { if (!s.done && !currMarked) { s.curr = true; currMarked = true; } });
+
+      root.innerHTML = `
+        <div class="order-card">
+          <div class="order-head">
+            <div>
+              <div class="eyebrow">Your order</div>
+              <h2>${order.name || "Customer"}</h2>
+              <div class="id">${order.id} · placed ${date}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="eyebrow">Total paid</div>
+              <div class="total">${BB_APP.rupee(order.total)}</div>
+              <div class="muted small">via ${order.payment === 'cod' ? 'COD' : 'UPI'}</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div style="padding: 14px; background: var(--bg-sub); border-radius: var(--radius);">
+              <div class="eyebrow">${order.mode === 'pickup' ? 'Pickup from' : 'Delivering to'}</div>
+              <div style="font-size: 14px; margin-top: 6px; line-height: 1.5;">${order.address}${order.pin ? `<br/>PIN ${order.pin}` : ''}</div>
+            </div>
+            <div style="padding: 14px; background: color-mix(in srgb, var(--ok) 10%, transparent); border-radius: var(--radius);">
+              <div class="eyebrow" style="color: var(--ok)">Estimated ${order.mode === 'pickup' ? 'pickup' : 'delivery'}</div>
+              <div style="font-size: 18px; font-weight: 700; color: var(--ok); margin-top: 6px;">${eta}</div>
+            </div>
+          </div>
+
+          <div class="tracker">
+            ${stepStates.map((s, i) => `
+              <div class="tr-step ${s.done ? 'done' : ''} ${s.curr ? 'curr' : ''}">
+                <div class="dot">${s.done ? '✓' : (s.curr ? '●' : i+1)}</div>
+                <div class="body">
+                  <h3>${s.label}</h3>
+                  <div class="when">${s.t}</div>
+                  <p>${s.msg}</p>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+
+          <div class="items">
+            <h3>${order.items.length} item${order.items.length !== 1 ? 's' : ''}</h3>
+            ${order.items.map(i => `
+              <div class="it">
+                <img src="${i.img}" alt=""/>
+                <div>
+                  <div class="n">${i.name}</div>
+                  <div class="m">Qty ${i.qty} · ${BB_APP.rupee(i.price)} each</div>
+                </div>
+                <div class="p">${BB_APP.rupee(i.price * i.qty)}</div>
+              </div>
+            `).join("")}
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap;">
+            <a class="btn" href="https://wa.me/917974096667">💬 WhatsApp us</a>
+            <a class="btn btn-ghost" href="tel:+917974096667">📞 Call outlet</a>
+            <a class="btn btn-ghost" href="account.html">View all orders →</a>
+          </div>
+        </div>
+      `;
+    }
+
+    if (askId) {
+      document.getElementById("lookup-id").value = askId;
+      renderOrder(askId);
+    } else {
+      // show most recent order if any
+      const orders = BB_APP.orders.read();
+      if (orders.length > 0) {
+        const latest = orders[orders.length - 1];
+        document.getElementById("lookup-id").value = latest.id;
+        renderOrder(latest.id);
+      } else {
+        document.getElementById("content").innerHTML = `
+          <div class="empty">
+            <div class="ic">📦</div>
+            <h2 class="h2 disp">No orders yet</h2>
+            <p class="muted">Once you place an order, you can track it here in real-time.</p>
+            <a class="btn" href="collections.html" style="margin-top: 16px;">Browse collections →</a>
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

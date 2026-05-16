@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bangali Sweets — Storefront &amp; Admin · Design Exploration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Hind:wght@400;500;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    html, body { margin: 0; background: #f0eee9; font-family: "Manrope", system-ui, sans-serif; }
+    a { color: inherit; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <!-- Data + shared atoms -->
+  <script src="data.js"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="components/shared.jsx"></script>
+
+  <!-- Direction A -->
+  <script type="text/babel" src="components/home-a.jsx"></script>
+  <script type="text/babel" src="components/mobile-flow-a.jsx"></script>
+  <script type="text/babel" src="components/admin-a.jsx"></script>
+
+  <!-- Direction B -->
+  <script type="text/babel" src="components/home-b.jsx"></script>
+  <script type="text/babel" src="components/mobile-flow-b.jsx"></script>
+  <script type="text/babel" src="components/admin-b.jsx"></script>
+
+  <script type="text/babel" data-presets="env,react">
+    const { HomeA, MobileFlowA, AdminA, HomeB, MobileFlowB, AdminB } = window;
+
+    function App() {
+      return (
+        <DesignCanvas title="Bangali Sweets — Design exploration" subtitle="Two visual directions · storefront + admin">
+
+          <DCPostIt x={40} y={20}>
+            Hi Ramesh ji 👋<br/><br/>
+            Two visual directions for <b>Bangali Sweets &amp; Dryfruits</b> — both cover the full storefront (home → cart → OTP signup → UPI pay) and an admin dashboard with catalog, traffic analytics, funnel and customer LTV.<br/><br/>
+            <b>A · Mithai Editorial</b> — heritage cream &amp; oxblood, italic serif, brass-leaf detailing<br/>
+            <b>B · Saffron Modern</b> — bright ivory &amp; saffron, bigger rounded UI, magazine layout<br/><br/>
+            Click any board to focus it. Note: backend (MySQL, payment gateway) will need dev wiring — this is the design + flow.
+          </DCPostIt>
+
+          <DCSection id="dir-a" title="A · Mithai Editorial" subtitle="Cream / ivory · oxblood maroon · gold · Cormorant + Manrope · italic editorial">
+            <DCArtboard id="a-home"   label="Home · Desktop"     width={1440} height={2400}><HomeA/></DCArtboard>
+            <DCArtboard id="a-mobile" label="Mobile · Checkout flow" width={2780} height={760}><MobileFlowA/></DCArtboard>
+            <DCArtboard id="a-admin"  label="Admin · Catalog + Analytics" width={1480} height={1500}><AdminA/></DCArtboard>
+          </DCSection>
+
+          <DCSection id="dir-b" title="B · Saffron Modern" subtitle="Ivory · saffron orange · forest green · DM Serif + DM Sans · rounded contemporary">
+            <DCArtboard id="b-home"   label="Home · Desktop"     width={1440} height={2400}><HomeB/></DCArtboard>
+            <DCArtboard id="b-mobile" label="Mobile · Browse + Checkout flow" width={3110} height={760}><MobileFlowB/></DCArtboard>
+            <DCArtboard id="b-admin"  label="Admin · Overview + Funnel" width={1480} height={1700}><AdminB/></DCArtboard>
+          </DCSection>
+
+          <DCPostIt x={40} y={2950}>
+            <b>What's still to do</b><br/>
+            • Pick a direction (or mix — e.g. A's logo + B's product cards)<br/>
+            • Real product photography (10 photos = a lot of visual fidelity)<br/>
+            • Backend handoff: MySQL schema, Razorpay UPI keys, OTP provider (MSG91 / Twilio), WhatsApp Business API<br/>
+            • SEO: meta tags, schema.org/Product markup, sitemap, Hindi/English hreflang<br/>
+            • Add: order tracking page, account/profile screens, returns flow, B2B portal
+          </DCPostIt>
+
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>
