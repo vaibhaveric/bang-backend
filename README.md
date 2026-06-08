@@ -1,8 +1,0 @@
-# Bang
-# Bang
-# Bang
-# Bang
-# Bang
-# Bang
-# Bang
-# Bang
