@@ -79,25 +79,38 @@ public class OrderService {
             Long productId = Long.valueOf(ci.get("id").toString());
             int qty = Integer.parseInt(ci.get("qty").toString());
 
+            // weight = kg per box for weight-priced items (e.g. 0.25); defaults to 1 for unit-priced products.
+            BigDecimal weight = ci.get("weight") != null
+                    ? new BigDecimal(ci.get("weight").toString())
+                    : BigDecimal.ONE;
+            Object wl = ci.get("weightLabel");
+            String weightLabel = wl != null ? wl.toString() : null;
+
             Product p = productRepo.findById(productId)
                     .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
 
-            if (p.getStock() < qty) throw new RuntimeException("Insufficient stock for: " + p.getNameEn());
+            // Stock is in kg for weight-priced items, in units otherwise (weight == 1).
+            BigDecimal deduct = weight.multiply(BigDecimal.valueOf(qty));
+            if (p.getStock().compareTo(deduct) < 0)
+                throw new RuntimeException("Insufficient stock for: " + p.getNameEn());
+
+            BigDecimal unitPrice = p.getPrice().multiply(weight);   // price for one box of this weight
+            String label = (weightLabel != null && !weightLabel.isBlank()) ? " (" + weightLabel + ")" : "";
 
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setProductId(p.getId());
-            item.setProductName(p.getNameEn() + " / " + p.getNameHi());
+            item.setProductName(p.getNameEn() + " / " + p.getNameHi() + label);
             item.setProductImage(p.getImageUrl());
-            item.setUnitPrice(p.getPrice());
+            item.setUnitPrice(unitPrice);
             item.setQuantity(qty);
-            item.setSubtotal(p.getPrice().multiply(BigDecimal.valueOf(qty)));
+            item.setSubtotal(unitPrice.multiply(BigDecimal.valueOf(qty)));
             order.getItems().add(item);
 
             subtotal = subtotal.add(item.getSubtotal());
 
-            // Deduct stock
-            p.setStock(p.getStock() - qty);
+            // Deduct stock (kg for weight items, units otherwise) and count boxes sold
+            p.setStock(p.getStock().subtract(deduct));
             p.setSoldCount(p.getSoldCount() + qty);
             productRepo.save(p);
         }

@@ -36,11 +36,16 @@ public class Product {
     @Column(length = 64)
     private String unit;
 
-    @Column(nullable = false)
-    private Integer stock = 0;
+    // Weight-priced products (sweets/namkeen/dairy) track stock in kg, so this is decimal.
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal stock = BigDecimal.ZERO;
 
     @Column(length = 512)
     private String imageUrl;
+
+    // Additional gallery images, stored comma-separated. imageUrl stays the primary/first image.
+    @Column(columnDefinition = "TEXT")
+    private String images;
 
     @Column(length = 64)
     private String tag;

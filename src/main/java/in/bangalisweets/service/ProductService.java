@@ -61,9 +61,9 @@ public class ProductService {
     }
 
     @Transactional
-    public Product restock(Long id, int qty) {
+    public Product restock(Long id, java.math.BigDecimal qty) {
         Product p = getById(id);
-        p.setStock(p.getStock() + qty);
+        p.setStock(p.getStock().add(qty));
         return productRepo.save(p);
     }
 }

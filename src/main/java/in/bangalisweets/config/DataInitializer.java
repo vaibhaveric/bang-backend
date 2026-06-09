@@ -101,7 +101,7 @@ public class DataInitializer {
         Product p = new Product();
         p.setSku(sku); p.setCategory(cat); p.setNameEn(en); p.setNameHi(hi);
         p.setUnit(unit); p.setPrice(BigDecimal.valueOf(price)); p.setMrp(BigDecimal.valueOf(mrp));
-        p.setStock(stock); p.setImageUrl(img); p.setTag(tag);
+        p.setStock(BigDecimal.valueOf(stock)); p.setImageUrl(img); p.setTag(tag);
         p.setDescription(desc); p.setIngredients(ingredients); p.setShelfLife(shelf);
         p.setHsnCode(hsn); p.setGstPercent(gst);
         p.setSeoTitle(seoTitle); p.setSeoDescription(seoDesc);

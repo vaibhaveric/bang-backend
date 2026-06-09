@@ -58,8 +58,8 @@ public class AdminProductController {
     }
 
     @PostMapping("/{id}/restock")
-    public ResponseEntity<Product> restock(@PathVariable Long id, @RequestBody Map<String, Integer> body) {
-        return ResponseEntity.ok(productService.restock(id, body.get("qty")));
+    public ResponseEntity<Product> restock(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        return ResponseEntity.ok(productService.restock(id, new BigDecimal(body.get("qty").toString())));
     }
 
     @PostMapping("/upload-image")
@@ -79,8 +79,16 @@ public class AdminProductController {
         if (body.containsKey("price")) p.setPrice(new BigDecimal(body.get("price").toString()));
         if (body.containsKey("mrp")) p.setMrp(new BigDecimal(body.get("mrp").toString()));
         if (body.containsKey("unit")) p.setUnit((String) body.get("unit"));
-        if (body.containsKey("stock")) p.setStock(Integer.parseInt(body.get("stock").toString()));
+        if (body.containsKey("stock")) p.setStock(new BigDecimal(body.get("stock").toString()));
         if (body.containsKey("imageUrl")) p.setImageUrl((String) body.get("imageUrl"));
+        if (body.containsKey("images")) {
+            Object imgs = body.get("images");
+            if (imgs instanceof java.util.List<?> list) {
+                p.setImages(String.join(",", list.stream().map(Object::toString).toList()));
+            } else {
+                p.setImages(imgs != null ? imgs.toString() : null);
+            }
+        }
         if (body.containsKey("tag")) p.setTag((String) body.get("tag"));
         if (body.containsKey("description")) p.setDescription((String) body.get("description"));
         if (body.containsKey("ingredients")) p.setIngredients((String) body.get("ingredients"));
