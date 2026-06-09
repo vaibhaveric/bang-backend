@@ -1,0 +1,38 @@
+# ───────────── Build output ─────────────
+target/
+build/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+
+# ───────────── Logs ─────────────
+*.log
+logs/
+
+# ───────────── Runtime uploads ─────────────
+uploads/
+src/main/resources/static/uploads/
+
+# ───────────── Secrets / local config ─────────────
+# Keep credentials out of git. Commit an application.properties.example template instead.
+application-local.properties
+application-secret.properties
+*.env
+.env
+
+# ───────────── IDE ─────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+nbproject/
+.nb-gradle/
+
+# ───────────── OS ─────────────
+.DS_Store
+Thumbs.db
