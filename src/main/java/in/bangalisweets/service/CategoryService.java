@@ -2,6 +2,7 @@ package in.bangalisweets.service;
 
 import in.bangalisweets.entity.Category;
 import in.bangalisweets.repository.CategoryRepository;
+import in.bangalisweets.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,9 +12,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepo;
+    private final ProductRepository productRepo;
 
-    public CategoryService(CategoryRepository categoryRepo) {
+    public CategoryService(CategoryRepository categoryRepo, ProductRepository productRepo) {
         this.categoryRepo = categoryRepo;
+        this.productRepo = productRepo;
     }
 
     public List<Category> getAll() {
@@ -39,10 +42,17 @@ public class CategoryService {
         return categoryRepo.save(category);
     }
 
+    // Hard delete — the category is removed from the DB so the admin and public lists
+    // stay in sync. Refuse if products still reference it, to avoid orphaning them
+    // (the category_id FK is NOT NULL).
     @Transactional
     public void delete(Long id) {
         Category c = getById(id);
-        c.setActive(false);
-        categoryRepo.save(c);
+        long products = productRepo.countByCategory(c);
+        if (products > 0) {
+            throw new IllegalStateException(
+                "Cannot delete category with " + products + " product(s). Move or delete them first.");
+        }
+        categoryRepo.delete(c);
     }
 }

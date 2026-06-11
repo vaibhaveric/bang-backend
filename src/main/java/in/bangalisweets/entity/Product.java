@@ -36,7 +36,13 @@ public class Product {
     @Column(length = 64)
     private String unit;
 
-    // Weight-priced products (sweets/namkeen/dairy) track stock in kg, so this is decimal.
+    // Available weights for weight-priced bakery items, as a CSV of kg values
+    // (e.g. "0.5,1,1.5,2"). Customers pick one; box price = price(per kg) × weight.
+    // Empty/null for fixed-weight categories (sweets/namkeen/dairy) and per-item ones.
+    @Column(columnDefinition = "TEXT")
+    private String weightOptions;
+
+    // Weight-priced products (sweets/namkeen/dairy/bakery) track stock in kg, so this is decimal.
     @Column(nullable = false, precision = 10, scale = 3)
     private BigDecimal stock = BigDecimal.ZERO;
 
@@ -73,6 +79,11 @@ public class Product {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    // Admin-controlled position within a category (drag-to-reorder in the dashboard).
+    // The public catalogue orders by this ascending, with nameEn as the tiebreaker.
+    @Column(nullable = false)
+    private Integer displayOrder = 0;
 
     @Column(nullable = false)
     private Integer soldCount = 0;

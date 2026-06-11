@@ -26,7 +26,8 @@ public class FileService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file: " + e.getMessage());
         }
-        return "/uploads/" + filename;
+        // Path is relative to the frontend origin, which serves assets/uploads/ statically.
+        return "/assets/uploads/" + filename;
     }
 
     private String getExtension(String filename) {

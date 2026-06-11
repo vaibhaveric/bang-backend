@@ -62,6 +62,16 @@ public class AdminProductController {
         return ResponseEntity.ok(productService.restock(id, new BigDecimal(body.get("qty").toString())));
     }
 
+    // Persist the admin's drag-to-reorder: body is { "ids": [12, 7, 3, ...] } in the new order.
+    @PatchMapping("/reorder")
+    public ResponseEntity<Void> reorder(@RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<Object> raw = (List<Object>) body.getOrDefault("ids", List.of());
+        List<Long> ids = raw.stream().map(o -> Long.valueOf(o.toString())).toList();
+        productService.reorder(ids);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/upload-image")
     public ResponseEntity<Map<String, String>> uploadImage(@RequestParam MultipartFile file) {
         String url = fileService.store(file);
@@ -79,6 +89,7 @@ public class AdminProductController {
         if (body.containsKey("price")) p.setPrice(new BigDecimal(body.get("price").toString()));
         if (body.containsKey("mrp")) p.setMrp(new BigDecimal(body.get("mrp").toString()));
         if (body.containsKey("unit")) p.setUnit((String) body.get("unit"));
+        if (body.containsKey("weightOptions")) p.setWeightOptions((String) body.get("weightOptions"));
         if (body.containsKey("stock")) p.setStock(new BigDecimal(body.get("stock").toString()));
         if (body.containsKey("imageUrl")) p.setImageUrl((String) body.get("imageUrl"));
         if (body.containsKey("images")) {
@@ -98,6 +109,7 @@ public class AdminProductController {
         if (body.containsKey("seoTitle")) p.setSeoTitle((String) body.get("seoTitle"));
         if (body.containsKey("seoDescription")) p.setSeoDescription((String) body.get("seoDescription"));
         if (body.containsKey("active")) p.setActive((Boolean) body.get("active"));
+        if (body.containsKey("displayOrder")) p.setDisplayOrder(Integer.parseInt(body.get("displayOrder").toString()));
         return p;
     }
 }

@@ -22,7 +22,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
+    public ResponseEntity<List<Product>> getAll(@RequestParam(required = false) String category) {
+        if (category != null && !category.isBlank()) {
+            return ResponseEntity.ok(productService.getByCategory(category));
+        }
         return ResponseEntity.ok(productService.getAll());
     }
 

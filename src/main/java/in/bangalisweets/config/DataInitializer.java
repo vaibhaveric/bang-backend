@@ -53,8 +53,8 @@ public class DataInitializer {
             product(productRepo, "dy2", dairy, "Malai Lassi", "मलाई लस्सी", "500ml", 89, 99, 35, "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=900&q=80", null, "Thick, creamy sweet lassi topped with fresh malai.", "Full Fat Yogurt, Sugar, Cream, Cardamom, Rose Water", "1 day · Keep refrigerated", "2202", 12, null, null);
 
             // --- Products: Bakery ---
-            product(productRepo, "b1", bakery, "Chocolate Truffle Cake (1kg)", "चॉकलेट ट्रफल केक", "1kg", 899, 999, 8, "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=900&q=80", "Bestseller", "Rich, moist chocolate cake layered with dark chocolate ganache. Order 24hrs in advance.", "Refined Flour, Cocoa, Eggs, Butter, Dark Chocolate, Cream", "2 days · Keep refrigerated", "1905", 18, null, null);
-            product(productRepo, "b2", bakery, "Vanilla Cream Cake (500g)", "वनीला क्रीम केक", "500g", 499, 549, 12, "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=900&q=80", null, "Light, airy vanilla sponge with fresh whipped cream frosting.", "Refined Flour, Eggs, Butter, Vanilla, Cream, Sugar", "2 days · Keep refrigerated", "1905", 18, null, null);
+            product(productRepo, "b1", bakery, "Chocolate Truffle Cake", "चॉकलेट ट्रफल केक", "per kg", 899, 999, 8, "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=900&q=80", "Bestseller", "Rich, moist chocolate cake layered with dark chocolate ganache. Order 24hrs in advance.", "Refined Flour, Cocoa, Eggs, Butter, Dark Chocolate, Cream", "2 days · Keep refrigerated", "1905", 18, null, null, "0.5,1,1.5,2");
+            product(productRepo, "b2", bakery, "Vanilla Cream Cake", "वनीला क्रीम केक", "per kg", 998, 1098, 12, "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=900&q=80", null, "Light, airy vanilla sponge with fresh whipped cream frosting.", "Refined Flour, Eggs, Butter, Vanilla, Cream, Sugar", "2 days · Keep refrigerated", "1905", 18, null, null, "0.5,1,1.5");
 
             // --- Products: Hampers ---
             product(productRepo, "h1", hampers, "The Heritage Box", "हेरिटेज बॉक्स", "9 Mithai · 500g", 1499, 1799, 25, "https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=900&q=80", "Bestseller", "Our best-selling assorted mithai box with 9 handpicked sweets. Perfect for all occasions.", "Assorted Mithai, Decorative Box", "7 days · Keep refrigerated", "1704", 5, "Gift Hamper Online | Heritage Mithai Box | Bangali Sweets", "Order The Heritage Box online. 9 assorted mithai from Bangali Sweets Bhind. Same-day delivery in Bhind.");
@@ -105,6 +105,22 @@ public class DataInitializer {
         p.setDescription(desc); p.setIngredients(ingredients); p.setShelfLife(shelf);
         p.setHsnCode(hsn); p.setGstPercent(gst);
         p.setSeoTitle(seoTitle); p.setSeoDescription(seoDesc);
+        repo.save(p);
+    }
+
+    // Overload for weight-priced bakery items: price is per kg, weightOptions is a CSV of kg values.
+    private void product(ProductRepository repo, String sku, Category cat, String en, String hi,
+                         String unit, int price, int mrp, int stock, String img, String tag,
+                         String desc, String ingredients, String shelf,
+                         String hsn, int gst, String seoTitle, String seoDesc, String weightOptions) {
+        Product p = new Product();
+        p.setSku(sku); p.setCategory(cat); p.setNameEn(en); p.setNameHi(hi);
+        p.setUnit(unit); p.setPrice(BigDecimal.valueOf(price)); p.setMrp(BigDecimal.valueOf(mrp));
+        p.setStock(BigDecimal.valueOf(stock)); p.setImageUrl(img); p.setTag(tag);
+        p.setDescription(desc); p.setIngredients(ingredients); p.setShelfLife(shelf);
+        p.setHsnCode(hsn); p.setGstPercent(gst);
+        p.setSeoTitle(seoTitle); p.setSeoDescription(seoDesc);
+        p.setWeightOptions(weightOptions);
         repo.save(p);
     }
 

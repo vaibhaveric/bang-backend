@@ -21,7 +21,7 @@ public class ProductService {
     }
 
     public List<Product> getAll() {
-        return productRepo.findByActiveTrueOrderByNameEnAsc();
+        return productRepo.findAllActiveWithCategory();
     }
 
     public Product getById(Long id) {
@@ -35,9 +35,7 @@ public class ProductService {
     }
 
     public List<Product> getByCategory(String slug) {
-        Category cat = categoryRepo.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Category not found: " + slug));
-        return productRepo.findByCategoryAndActiveTrueOrderByNameEnAsc(cat);
+        return productRepo.findActiveByCategorySlugWithCategory(slug);
     }
 
     public List<Product> search(String q) {
@@ -65,5 +63,17 @@ public class ProductService {
         Product p = getById(id);
         p.setStock(p.getStock().add(qty));
         return productRepo.save(p);
+    }
+
+    /** Persist a new admin-defined ordering: displayOrder = position in the given id list. */
+    @Transactional
+    public void reorder(List<Long> orderedIds) {
+        for (int i = 0; i < orderedIds.size(); i++) {
+            final int order = i;
+            productRepo.findById(orderedIds.get(i)).ifPresent(p -> {
+                p.setDisplayOrder(order);
+                productRepo.save(p);
+            });
+        }
     }
 }
